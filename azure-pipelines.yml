@@ -1,3 +1,8 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
 trigger:
 - main
 
@@ -17,25 +22,30 @@ pool:
       rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
       includeRootFolder: false
       archiveType: 'tar'
-      tarFile: 'ebeltec-web.tar'
-      archiveFiles: '**/ebeltec-web/*.dockerfile'
-    displayName: 'Archive ebeltec-web image'
+      tarFile: 'example-webapp.tar'
+      archiveFiles: '**/example-webapp/*.dockerfile'
+    displayName: 'Archive example-webapp image'
 
   - task: ArchiveFiles@2
     inputs:
       rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
       includeRootFolder: false
       archiveType: 'tar'
-      tarFile: 'ebeltec-proxy.tar'
-      archiveFiles: '**/ebeltec-proxy/*.dockerfile'
-    displayName: 'Archive ebeltec-proxy image'
+      tarFile: 'example-proxy.tar'
+      archiveFiles: '**/example-proxy/*.dockerfile'
+    displayName: 'Archive example-proxy image'
 
-  - task: CopyFilesOverSSH@2
-    displayName: 'Copy tar files to server'
-    inputs:
-      sshEndpoint: 'your-ssh-endpoint'
-      sourceFolder: '$(System.DefaultWorkingDirectory)'
-      contents: '**/*.tar'
-      targetFolder: '/path/to/deployment/folder'
-      cleanTargetFolder: true
-      overwrite: true
+  - script: |
+      cd '$(System.DefaultWorkingDirectory)'
+      ls -lSha
+    displayName: 'Find Artifact'
+
+  #- task: CopyFilesOverSSH@2
+  #  displayName: 'Copy tar files to server'
+  #  inputs:
+  #    sshEndpoint: 'your-ssh-endpoint'
+  #    sourceFolder: '$(System.DefaultWorkingDirectory)'
+  #    contents: '**/*.tar'
+  #    targetFolder: '/path/to/deployment/folder'
+  #    cleanTargetFolder: true
+  #    overwrite: true
