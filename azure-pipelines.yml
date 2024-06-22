@@ -61,7 +61,7 @@ stages:
         mv images.tar ./artifact/
         cd ./artifact/
         ls -lSha
-      displayName: 'Find Artifact'
+      displayName: 'Prepare files'
     
     - task: ArchiveFiles@2
       displayName: 'Archive files'
@@ -74,4 +74,8 @@ stages:
       displayName: 'Publish $(tag).tar'
       inputs:
         artifactName: '$(System.TeamProject)'
-        targetPath: '$(Build.ArtifactStagingDirectory)/$(tag).tar'
+        targetPath: '$(Build.ArtifactStagingDirectory)/$(tag).zip'
+    
+    - script: |
+        rm -rf $(System.DefaultWorkingDirectory)/artifact/
+      displayName: 'Remove files'
