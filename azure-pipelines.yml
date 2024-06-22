@@ -11,12 +11,10 @@ pool:
 
 steps:
 
-  - task: DockerCompose@0
+  - script: |
+      docker-compose -f **/docker-compose.yml build
+      docker images
     displayName: 'Build images'
-    inputs:
-      id: $(Build.BuildNumber)
-      dockerComposeFile: '**/docker-compose.yml' # string. Required. Docker Compose File. Default: **/docker-compose.yml.
-      action: 'Build'
 
   - task: ArchiveFiles@2
     inputs:
