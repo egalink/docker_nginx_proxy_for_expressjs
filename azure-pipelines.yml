@@ -14,6 +14,7 @@ steps:
   - task: DockerCompose@0
     displayName: 'Build images'
     inputs:
+      id: $(Build.BuildNumber)
       dockerComposeFile: '**/docker-compose.yml' # string. Required. Docker Compose File. Default: **/docker-compose.yml.
       action: 'Build'
 
