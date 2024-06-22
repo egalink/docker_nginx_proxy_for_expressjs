@@ -48,17 +48,20 @@ stages:
 
     - script: |
         cd '$(System.DefaultWorkingDirectory)'
-        ls -lSha # | grep *.tar
+        ls -lSha | grep *.tar
 
+        mkdir -p artifact
+        cp $(System.DefaultWorkingDirectory)/docker-compose.yml ./artifact/
+        mv $(System.DefaultWorkingDirectory)/images.tar ./artifact/
+        ls -lSha
       displayName: 'Find Artifact'
     
-    #- task: ArchiveFiles@2
-    #  displayName: 'Archive files'
-    #  inputs:
-    #    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-    #    archiveType: 'zip'
-    #    archiveFile: '$(System.ArtifactStagingDirectory)/my-archive.zip'
-    #    archiveFilePattern: '*.tar, docker-compose.yml'
+    - task: ArchiveFiles@2
+      displayName: 'Archive files'
+      inputs:
+        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/artifact'
+        archiveType: 'zip'
+        archiveFile: '$(System.ArtifactStagingDirectory)/$(tag).zip'
 
     #- task: PublishPipelineArtifact@0
     #  displayName: 'Publish $(tag).tar'
