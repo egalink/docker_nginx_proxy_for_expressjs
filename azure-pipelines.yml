@@ -13,21 +13,27 @@ steps:
 
   - script: |
       docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml build
-      docker images
-      docker save $(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services) > compose-images.tar
+      docker images --filter=reference=$(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services)
+      
+      # This script will build the images using docker-compose build and then save the images
+      # as a tar file named images.tar in the current working directory:
+      docker save $(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services) > images.tar
+
+      ## If you want to save each image as a separate tar file, you can modify the script
+      ## as follows:
+
+      ## This script uses the docker-compose config command to get the list of services,
+      ## and then iterates over the list using a for loop. For each service, it saves the
+      ## image as a tar file with the same name as the service.
+
+      # ---> for service in $(docker-compose -f docker-compose.yml config --services); do
+      # --->   docker save $service > $service.tar
+      # ---> done
+
+      # docker load -i "images.tar"
     displayName: 'Build images'
 
   - script: |
       cd '$(System.DefaultWorkingDirectory)'
-      ls -lSha
+      ls -lSha | grep *.tar
     displayName: 'Find Artifact'
-
-  #- task: CopyFilesOverSSH@2
-  #  displayName: 'Copy tar files to server'
-  #  inputs:
-  #    sshEndpoint: 'your-ssh-endpoint'
-  #    sourceFolder: '$(System.DefaultWorkingDirectory)'
-  #    contents: '**/*.tar'
-  #    targetFolder: '/path/to/deployment/folder'
-  #    cleanTargetFolder: true
-  #    overwrite: true
