@@ -2,6 +2,12 @@
 # Start with a minimal pipeline that you can customize to build and deploy your code.
 # Add steps that build, run tests, deploy, and more:
 # https://aka.ms/yaml
+#
+# DOCS:
+#
+# Use predefined variables:
+# https://learn.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml
+#
 
 trigger:
 - main
@@ -64,8 +70,8 @@ stages:
         archiveType: 'zip'
         archiveFile: '$(Build.ArtifactStagingDirectory)/$(tag).zip'
 
-    #- task: PublishPipelineArtifact@0
-    #  displayName: 'Publish $(tag).tar'
-    #  inputs:
-    #    artifactName: '$(System.TeamProject)'
-    #    targetPath: '$(System.DefaultWorkingDirectory)/$(tag).tar'
+    - task: PublishPipelineArtifact@0
+      displayName: 'Publish $(tag).tar'
+      inputs:
+        artifactName: '$(System.TeamProject)'
+        targetPath: '$(Build.ArtifactStagingDirectory)/$(tag).tar'
