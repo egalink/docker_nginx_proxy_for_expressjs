@@ -34,6 +34,7 @@ stages:
         
         #!/bin/bash
         cd $(System.DefaultWorkingDirectory)
+        ls -lSha
 
         # docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml build
         docker-compose build
