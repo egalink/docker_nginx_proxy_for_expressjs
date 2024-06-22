@@ -6,34 +6,53 @@
 trigger:
 - main
 
-pool:
-  vmImage: 'ubuntu-latest'
+resources:
+- repo: self
 
-steps:
+variables:
+  tag: '$(Build.BuildNumber)'
 
-  - script: |
-      docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml build
-      docker images --filter=reference=$(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services)
-      
-      # This script will build the images using docker-compose build and then save the images
-      # as a tar file named images.tar in the current working directory:
-      docker save $(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services) > images.tar
+stages:
 
-      ## If you want to save each image as a separate tar file, you can modify the script
-      ## as follows:
+# stage 1: Build Artifact...
+- stage: Build
+  displayName: Build Artifact
+  jobs:
 
-      ## This script uses the docker-compose config command to get the list of services,
-      ## and then iterates over the list using a for loop. For each service, it saves the
-      ## image as a tar file with the same name as the service.
+  - job: Build
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
 
-      # ---> for service in $(docker-compose -f docker-compose.yml config --services); do
-      # --->   docker save $service > $service.tar
-      # ---> done
+    - script: |
+        docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml build
+        docker images --filter=reference=$(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services)
+        
+        # This script will build the images using docker-compose build and then save the images
+        # as a tar file named images.tar in the current working directory:
+        docker save $(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services) > images.tar
 
-      # docker load -i "images.tar"
-    displayName: 'Build images'
+        ## If you want to save each image as a separate tar file, you can modify the script
+        ## as follows:
 
-  - script: |
-      cd '$(System.DefaultWorkingDirectory)'
-      ls -lSha | grep *.tar
-    displayName: 'Find Artifact'
+        ## This script uses the docker-compose config command to get the list of services,
+        ## and then iterates over the list using a for loop. For each service, it saves the
+        ## image as a tar file with the same name as the service.
+
+        # ---> for service in $(docker-compose -f docker-compose.yml config --services); do
+        # --->   docker save $service > $service.tar
+        # ---> done
+
+        # docker load -i "images.tar"
+      displayName: 'Build images'
+
+    - script: |
+        cd '$(System.DefaultWorkingDirectory)'
+        ls -lSha | grep *.tar
+      displayName: 'Find Artifact'
+    
+    - task: PublishPipelineArtifact@0
+      displayName: 'Publish images.tar'
+      inputs:
+        artifactName: 'images'
+        targetPath: '$(System.DefaultWorkingDirectory)/images.tar'
