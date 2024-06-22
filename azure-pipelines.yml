@@ -12,7 +12,7 @@ pool:
 steps:
 
   - script: |
-      docker-compose -f **/docker-compose.yml build
+      docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml build
       docker images
     displayName: 'Build images'
 
