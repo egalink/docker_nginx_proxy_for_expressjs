@@ -1,0 +1,41 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+  steps:
+
+  - task: DockerCompose@0
+    displayName: 'Build images'
+    inputs:
+      dockerComposeFile: '**/docker-compose.yml' # string. Required. Docker Compose File. Default: **/docker-compose.yml.
+      action: 'Build'
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+      includeRootFolder: false
+      archiveType: 'tar'
+      tarFile: 'ebeltec-web.tar'
+      archiveFiles: '**/ebeltec-web/*.dockerfile'
+    displayName: 'Archive ebeltec-web image'
+
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+      includeRootFolder: false
+      archiveType: 'tar'
+      tarFile: 'ebeltec-proxy.tar'
+      archiveFiles: '**/ebeltec-proxy/*.dockerfile'
+    displayName: 'Archive ebeltec-proxy image'
+
+  - task: CopyFilesOverSSH@2
+    displayName: 'Copy tar files to server'
+    inputs:
+      sshEndpoint: 'your-ssh-endpoint'
+      sourceFolder: '$(System.DefaultWorkingDirectory)'
+      contents: '**/*.tar'
+      targetFolder: '/path/to/deployment/folder'
+      cleanTargetFolder: true
+      overwrite: true
