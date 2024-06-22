@@ -53,16 +53,13 @@ stages:
       displayName: 'Build images'
 
     - task: PublishPipelineArtifact@0
-      displayName: 'Publish images.tar'
+      displayName: 'Publish artifact'
       inputs:
         artifactName: '$(tag)'
-        targetPath: '$(System.DefaultWorkingDirectory)/images.tar'
-    
-    - task: PublishPipelineArtifact@0
-      displayName: 'Publish docker-compose.yml'
-      inputs:
-        artifactName: '$(tag)'
-        targetPath: '$(System.DefaultWorkingDirectory)/docker-compose.yml'
+        targetPath: '$(System.DefaultWorkingDirectory)'
+        paths: |
+          images.tar
+          docker-compose.yml
 
     - script: |
         rm -rf $(System.DefaultWorkingDirectory)/images.tar
