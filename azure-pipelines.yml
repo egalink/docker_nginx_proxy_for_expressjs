@@ -30,7 +30,7 @@ stages:
         
         # This script will build the images using docker-compose build and then save the images
         # as a tar file named images.tar in the current working directory:
-        docker save $(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services) > ./artifact/images.tar
+        docker save $(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services) > images.tar
 
         ## If you want to save each image as a separate tar file, you can modify the script
         ## as follows:
