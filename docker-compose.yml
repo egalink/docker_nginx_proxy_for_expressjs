@@ -2,6 +2,7 @@ version: '3'
 
 services:
   webapp:
+    image: webapp
     build: ./webapp
     expose:
       - "3000"
@@ -16,6 +17,7 @@ services:
         delay: 10s
 
   webapp-proxy:
+    image: webapp-proxy
     build: ./webapp-proxy
     ports:
       - "80:80"
