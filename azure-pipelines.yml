@@ -14,25 +14,8 @@ steps:
   - script: |
       docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml build
       docker images
+      docker save $(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services) > compose-images.tar
     displayName: 'Build images'
-
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-      includeRootFolder: false
-      archiveType: 'tar'
-      tarFile: 'example-webapp.tar'
-      archiveFiles: '**/example-webapp/*.dockerfile'
-    displayName: 'Archive example-webapp image'
-
-  - task: ArchiveFiles@2
-    inputs:
-      rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
-      includeRootFolder: false
-      archiveType: 'tar'
-      tarFile: 'example-proxy.tar'
-      archiveFiles: '**/example-proxy/*.dockerfile'
-    displayName: 'Archive example-proxy image'
 
   - script: |
       cd '$(System.DefaultWorkingDirectory)'
