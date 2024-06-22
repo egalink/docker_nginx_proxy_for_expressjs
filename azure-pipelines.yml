@@ -31,12 +31,20 @@ stages:
     steps:
 
     - script: |
-        docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml build
-        docker images --filter=reference=$(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services)
+        
+        #!/bin/bash
+        cd $(System.DefaultWorkingDirectory)
+
+        # docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml build
+        docker-compose build
+        
+        # docker images --filter=reference=$(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services)
+        docker images --filter=reference=$(docker-compose config --services)
         
         # This script will build the images using docker-compose build and then save the images
         # as a tar file named images.tar in the current working directory:
-        docker save $(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services) > images.tar
+        # docker save $(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services) > images.tar
+        docker save $(docker-compose config --services) > images.tar
 
         ## If you want to save each image as a separate tar file, you can modify the script
         ## as follows:
@@ -52,15 +60,17 @@ stages:
         # docker load -i "images.tar"
       displayName: 'Build images'
 
+    - script: |
+    
+        #!/bin/bash
+        mkdir -p $(Build.ArtifactStagingDirectory)/artifact/
+        cd $(System.DefaultWorkingDirectory)
+        cp $(System.DefaultWorkingDirectory)/docker-compose.yml $(Build.ArtifactStagingDirectory)/artifact/
+        mv $(System.DefaultWorkingDirectory)/images.tar $(Build.ArtifactStagingDirectory)/artifact/
+      displayName: 'Prepare artifact'
+
     - task: PublishPipelineArtifact@0
       displayName: 'Publish artifact'
       inputs:
         artifactName: '$(tag)'
-        targetPath: '$(System.DefaultWorkingDirectory)'
-        paths: |
-          images.tar
-          docker-compose.yml
-
-    - script: |
-        rm -rf $(System.DefaultWorkingDirectory)/images.tar
-      displayName: 'Remove files'
+        targetPath: '$(Build.ArtifactStagingDirectory)/artifact/'
