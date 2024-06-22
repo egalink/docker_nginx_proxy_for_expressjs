@@ -30,7 +30,7 @@ stages:
         
         # This script will build the images using docker-compose build and then save the images
         # as a tar file named images.tar in the current working directory:
-        docker save $(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services) > images.tar
+        docker save $(docker-compose -f $(System.DefaultWorkingDirectory)/docker-compose.yml config --services) > ./artifact/images.tar
 
         ## If you want to save each image as a separate tar file, you can modify the script
         ## as follows:
@@ -48,11 +48,20 @@ stages:
 
     - script: |
         cd '$(System.DefaultWorkingDirectory)'
-        ls -lSha | grep *.tar
+        ls -lSha # | grep *.tar
+
       displayName: 'Find Artifact'
     
-    - task: PublishPipelineArtifact@0
-      displayName: 'Publish images.tar'
-      inputs:
-        artifactName: 'images'
-        targetPath: '$(System.DefaultWorkingDirectory)/images.tar'
+    #- task: ArchiveFiles@2
+    #  displayName: 'Archive files'
+    #  inputs:
+    #    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+    #    archiveType: 'zip'
+    #    archiveFile: '$(System.ArtifactStagingDirectory)/my-archive.zip'
+    #    archiveFilePattern: '*.tar, docker-compose.yml'
+
+    #- task: PublishPipelineArtifact@0
+    #  displayName: 'Publish $(tag).tar'
+    #  inputs:
+    #    artifactName: '$(System.TeamProject)'
+    #    targetPath: '$(System.DefaultWorkingDirectory)/$(tag).tar'
