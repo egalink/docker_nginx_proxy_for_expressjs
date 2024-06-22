@@ -51,9 +51,9 @@ stages:
         ls -lSha | grep *.tar
 
         mkdir -p artifact
-        cp $(System.DefaultWorkingDirectory)/docker-compose.yml $(System.DefaultWorkingDirectory)/artifact/
-        mv $(System.DefaultWorkingDirectory)/images.tar $(System.DefaultWorkingDirectory)/artifact/
-        cd $(System.DefaultWorkingDirectory)/artifact/
+        cp docker-compose.yml ./artifact/
+        mv images.tar ./artifact/
+        cd ./artifact/
         ls -lSha
       displayName: 'Find Artifact'
     
@@ -62,10 +62,10 @@ stages:
       inputs:
         rootFolderOrFile: '$(System.DefaultWorkingDirectory)/artifact'
         archiveType: 'zip'
-        archiveFile: '$(System.DefaultWorkingDirectory)/$(tag).zip'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/$(tag).zip'
 
-    - task: PublishPipelineArtifact@0
-      displayName: 'Publish $(tag).tar'
-      inputs:
-        artifactName: '$(System.TeamProject)'
-        targetPath: '$(System.DefaultWorkingDirectory)/$(tag).tar'
+    #- task: PublishPipelineArtifact@0
+    #  displayName: 'Publish $(tag).tar'
+    #  inputs:
+    #    artifactName: '$(System.TeamProject)'
+    #    targetPath: '$(System.DefaultWorkingDirectory)/$(tag).tar'
