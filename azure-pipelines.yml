@@ -52,30 +52,18 @@ stages:
         # docker load -i "images.tar"
       displayName: 'Build images'
 
-    - script: |
-        cd '$(System.DefaultWorkingDirectory)'
-        ls -lSha | grep *.tar
-
-        mkdir -p artifact
-        cp docker-compose.yml ./artifact/
-        mv images.tar ./artifact/
-        cd ./artifact/
-        ls -lSha
-      displayName: 'Prepare files'
-    
-    - task: ArchiveFiles@2
-      displayName: 'Archive files'
-      inputs:
-        rootFolderOrFile: '$(System.DefaultWorkingDirectory)/artifact'
-        archiveType: 'zip'
-        archiveFile: '$(Build.ArtifactStagingDirectory)/$(tag).zip'
-
     - task: PublishPipelineArtifact@0
-      displayName: 'Publish $(tag).tar'
+      displayName: 'Publish images.tar'
       inputs:
-        artifactName: '$(System.TeamProject)'
-        targetPath: '$(Build.ArtifactStagingDirectory)/$(tag).zip'
+        artifactName: '$(tag)'
+        targetPath: '$(System.DefaultWorkingDirectory)/images.zip'
     
+    - task: PublishPipelineArtifact@0
+      displayName: 'Publish docker-compose.yml'
+      inputs:
+        artifactName: '$(tag)'
+        targetPath: '$(System.DefaultWorkingDirectory)/docker-compose.yml'
+
     - script: |
-        rm -rf $(System.DefaultWorkingDirectory)/artifact/
+        rm -rf $(System.DefaultWorkingDirectory)/images.tar
       displayName: 'Remove files'
